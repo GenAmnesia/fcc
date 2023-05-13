@@ -1,31 +1,5 @@
 /* eslint no-underscore-dangle: off */
-const mongoose = require('mongoose');
-
-const { Schema } = mongoose;
-
-const ProjectSchema = new Schema({
-  name: { type: String, required: true, unique: true },
-});
-const Project = mongoose.model('Project', ProjectSchema);
-
-const IssueSchema = new Schema({
-  project: { type: Schema.ObjectId, ref: 'Project', required: true },
-  issue_title: { type: String, required: true },
-  issue_text: { type: String, required: true },
-  created_on: { type: Date, default: Date.now },
-  updated_on: { type: Date, default: Date.now },
-  created_by: { type: String, default: '' },
-  assigned_to: { type: String, default: '' },
-  open: { type: Boolean, default: true },
-  status_text: { type: String, default: '' },
-});
-IssueSchema.methods.getPublicFields = function () {
-  const returnObject = { ...this._doc };
-  delete returnObject.project;
-  delete returnObject.__v;
-  return returnObject;
-};
-const Issue = mongoose.model('Issue', IssueSchema);
+const Issue = require('../models/Issue');
 
 module.exports = (app) => {
   app.route('/api/issues/:project')
@@ -33,8 +7,7 @@ module.exports = (app) => {
     .get(async (req, res, next) => {
       const { project } = req.params;
       try {
-        const projectData = await Project.findOne({ name: project }).orFail(() => Error(`Project ${project} not found!`));
-        const query = Issue.find({ project: projectData._id });
+        const query = Issue.find({ project });
         if (req.query.open) query.find({ open: req.query.open });
         if (req.query.created_by) query.find({ created_by: req.query.created_by });
         if (req.query.assigned_to) query.find({ assigned_to: req.query.assigned_to });
@@ -47,9 +20,9 @@ module.exports = (app) => {
     .post(async (req, res, next) => {
       const { project } = req.params;
       try {
-        const projectData = await Project.findOne({ name: project }).orFail(() => Error(`Project ${project} not found!`));
+        if (!req.body.issue_title || !req.body.issue_text || !req.body.created_by) throw new Error('required field(s) missing');
         const issue = new Issue({
-          project: projectData._id,
+          project,
           issue_title: req.body.issue_title,
           issue_text: req.body.issue_text,
           created_on: new Date(),
@@ -60,28 +33,52 @@ module.exports = (app) => {
         const issueData = await issue.save();
         res.send(issueData.getPublicFields());
       } catch (error) {
+        res.status(200).send({ error: error.message || 'could not post' });
         next(error);
       }
     })
 
     .put(async (req, res, next) => {
       try {
-        const issue = await Issue.findOne({ _id: req.body._id }).orFail(() => Error(`No issue ${req.body._id} found!`));
+        if (!req.body._id) throw new Error('missing _id', { cause: 'no-id' });
+
+        const issue = await Issue.findById(req.body._id);
+
+        Object.keys(req.body);
+        if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty('_id')) {
+          throw new Error('no update field(s) sent', { cause: 'no-fields' });
+        }
+
         issue.updated_on = new Date();
-        if (req.body.issue_title) issue.issue_title = req.body.issue_title;
-        if (req.body.issue_text) issue.issue_text = req.body.issue_text;
-        if (req.body.created_by) issue.created_by = req.body.created_by;
-        if (req.body.assigned_to) issue.assigned_to = req.body.assigned_to;
-        if (req.body.status_text) issue.status_text = req.body.status_text;
-        if (req.body.open) issue.open = req.body.open;
+        issue.issue_title = req.body.issue_title;
+        issue.issue_text = req.body.issue_text;
+        issue.created_by = req.body.created_by;
+        issue.assigned_to = req.body.assigned_to;
+        issue.status_text = req.body.status_text;
+        issue.open = req.body.open;
         const data = await issue.save();
-        res.send(data.getPublicFields());
-      } catch (error) { next(error); }
+        res.send({ result: 'successfully updated', _id: data._id });
+      } catch (error) {
+        if (error.cause === 'no-id') {
+          res.status(200).send({ error: error.message });
+        } else if (error.cause === 'no-fields') {
+          res.status(200).send({ error: error.message, _id: req.body._id });
+        } else {
+          res.status(200).send({ error: 'could not update', _id: req.body._id });
+        }
+        next(error);
+      }
     })
 
-    .delete((req, res, next) => {
-      Issue.deleteOne({ _id: req.body._id })
-        .then((data) => res.send(data))
-        .catch((err) => next(err));
+    .delete(async (req, res, next) => {
+      try {
+        if (!req.body._id) throw new Error('missing _id', { cause: 'no-id' });
+        const data = await Issue.deleteOne({ _id: req.body._id }).orFail();
+        res.send({ result: 'successfully deleted', _id: req.body._id });
+      } catch (error) {
+        if (error.cause === 'no-id') res.status(200).send({ error: error.message });
+        else res.status(200).send({ error: 'could not delete', _id: req.body._id });
+        next(error);
+      }
     });
 };
