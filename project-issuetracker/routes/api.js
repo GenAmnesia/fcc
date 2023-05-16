@@ -45,7 +45,7 @@ module.exports = (app) => {
         const issue = await Issue.findById(req.body._id);
 
         Object.keys(req.body);
-        if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty('_id')) {
+        if (Object.keys(req.body).length === 1 && Object.prototype.hasOwnProperty.call(req.body, '_id')) {
           throw new Error('no update field(s) sent', { cause: 'no-fields' });
         }
 
@@ -73,7 +73,7 @@ module.exports = (app) => {
     .delete(async (req, res, next) => {
       try {
         if (!req.body._id) throw new Error('missing _id', { cause: 'no-id' });
-        const data = await Issue.deleteOne({ _id: req.body._id }).orFail();
+        await Issue.deleteOne({ _id: req.body._id }).orFail();
         res.send({ result: 'successfully deleted', _id: req.body._id });
       } catch (error) {
         if (error.cause === 'no-id') res.status(200).send({ error: error.message });
