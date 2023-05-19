@@ -9,7 +9,7 @@ const solver = new SudokuSolver();
 
 chai.use(chaiHttp);
 
-suite('Functional Tests', () => {
+suite('Unit Tests', () => {
   test('Validate puzzle string of 81 characters', () => {
     examples.forEach((v) => {
       const isValid = solver.validate(v[0]).valid;
@@ -17,7 +17,7 @@ suite('Functional Tests', () => {
     });
   });
   test('Validate puzzle string with invalid characters (not 1-9 or .)', () => {
-    const isValid = solver.validate('5..91abc.3...8.5.9.9.25..8.68.47.23...95..46.7.4.....5.2.......4..8916..85.72...3');
+    const isValid = solver.validate('0..91abc.3...8.5.9.9.25..8.68.47.23...95..46.7.4.....5.2.......4..8916..85.72...3');
     assert.isNotTrue(isValid.valid);
     assert.equal(isValid.message, 'Invalid characters in puzzle');
   });
@@ -66,9 +66,9 @@ suite('Functional Tests', () => {
     });
   });
   test('Handle an invalid column placement', () => {
-    [[1, 2, '7'], [4, 1, '2'], [5, 2, '7']].forEach((valuesSet) => {
+    [[1, 1, '1'], [4, 4, '7'], [4, 6, '4']].forEach((valuesSet) => {
       const isValueValid = solver.checkColPlacement(
-        examples[0][0],
+        examples[5][0],
         valuesSet[0],
         valuesSet[1],
         valuesSet[2],

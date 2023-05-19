@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 const getRow = (index) => Math.floor(index / 9) + 1;
 const getCol = (index) => (index % 9) + 1;
 const getRegion = (row, col) => Math.floor((row - 1) / 3) * 3 + Math.floor((col - 1) / 3) + 1;
@@ -7,7 +8,7 @@ class SudokuSolver {
     if (!puzzleString || puzzleString.length !== 81) {
       return { valid: false, message: 'Expected puzzle to be 81 characters long' };
     }
-    for (let i = 0; i < puzzleString.length; i++) {
+    for (let i = 0; i < puzzleString.length; i += 1) {
       if (!puzzleString[i].match(/[1-9.]/)) {
         return { valid: false, message: 'Invalid characters in puzzle' };
       }
@@ -39,21 +40,21 @@ class SudokuSolver {
     return true;
   }
 
-  solve(puzzleString) {
-    /**
-     * Checks if a value 1-9 is a possible solution for a cell in the sudoku
-     * @param {String} string The puzzle string
-     * @param {Number} row Row number [1-9]
-     * @param {Number} col Column number [1-9]
-     * @param {String} val Number [1-9] to check
-     * @returns {Boolean}
-     */
-    const isValueValid = (string, row, col, val) => (
-      this.checkRowPlacement(string, row, col, val)
-      && this.checkColPlacement(string, row, col, val)
-      && this.checkRegionPlacement(string, row, col, val)
-    );
+  /**
+  * Checks if a value 1-9 is a possible solution for a cell in the sudoku
+  * @param {String} string The puzzle string
+  * @param {Number} row Row number [1-9]
+  * @param {Number} col Column number [1-9]
+  * @param {String} val Number [1-9] to check
+  * @returns {Boolean}
+  */
+  isValueValid(string, row, col, val) {
+    return (this.checkRowPlacement(string, row, col, val)
+        && this.checkColPlacement(string, row, col, val)
+        && this.checkRegionPlacement(string, row, col, val));
+  }
 
+  solve(puzzleString) {
     // If the puzzle string to solve is invalid, return an error message.
     const validatePuzzle = this.validate(puzzleString);
     if (!validatePuzzle.valid) return { solved: false, string: validatePuzzle.message };
@@ -79,9 +80,9 @@ class SudokuSolver {
      * puzzle cannot be solved, put the "." again and try the next placeable value.
      * This is a backtrack strategy.
      *  */
-    for (let num = 1; num <= 9; num++) {
+    for (let num = 1; num <= 9; num += 1) {
       if (
-        isValueValid(
+        this.isValueValid(
           puzzleArr.join(''),
           getRow(index),
           getCol(index),
