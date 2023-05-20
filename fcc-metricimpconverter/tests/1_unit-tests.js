@@ -5,7 +5,7 @@ const ConvertHandler = require('../controllers/convertHandler.js');
 
 const convertHandler = new ConvertHandler();
 
-const round = (num) => Math.round((num + Number.EPSILON) * 1000) / 1000;
+const round = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
 
 suite('Unit Tests', () => {
     test('Read whole number', () => {
@@ -22,7 +22,7 @@ suite('Unit Tests', () => {
         assert.equal(convertHandler.getNum('7.6mi'), 7.6);
         assert.equal(convertHandler.getNum('12.03km'), 12.03);
         assert.equal(convertHandler.getNum('5.565lbs'), 5.565);
-        assert.equal(convertHandler.getNum('8.145677kg'), 8.146);
+        assert.equal(convertHandler.getNum('8.145677kg'), 8.14568);
     });
     test('Read fractional', () => {
         assert.equal(convertHandler.getNum('4/2gal'), round(4 / 2));
@@ -63,7 +63,7 @@ suite('Unit Tests', () => {
     });
     test('Input units error', () => {
         assert.isNotOk(convertHandler.getUnit('23kgal'), 'gal');
-        assert.isNotOk(convertHandler.getUnit('1/2l'), 'L');
+        assert.isNotOk(convertHandler.getUnit('1/2min'), 'min');
         assert.isNotOk(convertHandler.getUnit('12.45mihg'), 'mi');
     });
     test('Return correct input units', () => {
@@ -83,33 +83,33 @@ suite('Unit Tests', () => {
         assert.equal(convertHandler.spellOutUnit('kg'), 'kilograms');
     });
     test('gal to L', () => {
-        assert.equal(convertHandler.convert(5, 'gal'), 18.927);
-        assert.equal(convertHandler.convert(1.5, 'gal'), 5.678);
-        assert.equal(convertHandler.convert(2 / 5, 'gal'), 1.514);
+        assert.equal(convertHandler.convert(5, 'gal'), 18.92705);
+        assert.equal(convertHandler.convert(1.5, 'gal'), 5.67812);
+        assert.equal(convertHandler.convert(2 / 5, 'gal'), 1.51416);
     });
     test('L to gal', () => {
-        assert.equal(convertHandler.convert(5, 'L'), 1.321);
-        assert.equal(convertHandler.convert(1.5, 'L'), 0.396);
-        assert.equal(convertHandler.convert(2 / 5, 'L'), 0.106);
+        assert.equal(convertHandler.convert(5, 'L'), 1.32086);
+        assert.equal(convertHandler.convert(1.5, 'L'), 0.39626);
+        assert.equal(convertHandler.convert(2 / 5, 'L'), 0.10567);
     });
     test('mi to km', () => {
-        assert.equal(convertHandler.convert(5, 'mi'), 8.047);
-        assert.equal(convertHandler.convert(1.5, 'mi'), 2.414);
-        assert.equal(convertHandler.convert(2 / 5, 'mi'), 0.644);
+        assert.equal(convertHandler.convert(5, 'mi'), 8.0467);
+        assert.equal(convertHandler.convert(1.5, 'mi'), 2.41401);
+        assert.equal(convertHandler.convert(2 / 5, 'mi'), 0.64374);
     });
     test('km to mi', () => {
-        assert.equal(convertHandler.convert(5, 'km'), 3.107);
-        assert.equal(convertHandler.convert(1.5, 'km'), 0.932);
-        assert.equal(convertHandler.convert(2 / 5, 'km'), 0.249);
+        assert.equal(convertHandler.convert(5, 'km'), 3.10686);
+        assert.equal(convertHandler.convert(1.5, 'km'), 0.93206);
+        assert.equal(convertHandler.convert(2 / 5, 'km'), 0.24855);
     });
     test('lbs to kg', () => {
-        assert.equal(convertHandler.convert(5, 'lbs'), 2.268);
-        assert.equal(convertHandler.convert(1.5, 'lbs'), 0.680);
-        assert.equal(convertHandler.convert(2 / 5, 'lbs'), 0.181);
+        assert.equal(convertHandler.convert(5, 'lbs'), 2.26796);
+        assert.equal(convertHandler.convert(1.5, 'lbs'), 0.68039);
+        assert.equal(convertHandler.convert(2 / 5, 'lbs'), 0.18144);
     });
     test('kg to lbs', () => {
-        assert.equal(convertHandler.convert(5, 'kg'), 11.023);
-        assert.equal(convertHandler.convert(1.5, 'kg'), 3.307);
-        assert.equal(convertHandler.convert(2 / 5, 'kg'), 0.882);
+        assert.equal(convertHandler.convert(5, 'kg'), 11.02312);
+        assert.equal(convertHandler.convert(1.5, 'kg'), 3.30694);
+        assert.equal(convertHandler.convert(2 / 5, 'kg'), 0.88185);
     });
 });

@@ -1,9 +1,9 @@
-const round = (num) => Math.round((num + Number.EPSILON) * 1000) / 1000;
+const round = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
 
 function ConvertHandler() {
     this.getNum = (input) => {
         const numberRe = /^(\d*((?<=\d)\.(?=\d))?\d+)?\/?(\d*((?<=\d)\.(?=\d))?\d+)?(?= ?\w* *$)/;
-        const unitOnlyRe = /^(gal)$|^(L)$|^(mi)$|^(km)$|^(lbs)$|^(kg)$/;
+        const unitOnlyRe = /^(gal)$|^(L)$|^(mi)$|^(km)$|^(lbs)$|^(kg)$/i;
 
         if (unitOnlyRe.test(input)) return 1;
         if (numberRe.test(input)) {
@@ -13,20 +13,22 @@ function ConvertHandler() {
     };
 
     this.getUnit = (input) => {
-        const unitRe = /(^(gal)$|^(L)$|^(mi)$|^(km)$|^(lbs)$|^(kg)$)|((?<=\d ?)(gal|L|mi|km|lbs|kg)$)/;
+        const unitRe = /(^(gal)$|^(L)$|^(mi)$|^(km)$|^(lbs)$|^(kg)$)|((?<=\d ?)(gal|L|mi|km|lbs|kg)$)/i;
         if (unitRe.test(input)) {
-            return input.match(unitRe)[0];
+            if (input.match(unitRe)[0] === 'l' || input.match(unitRe)[0] === 'L') return 'L';
+            return input.match(unitRe)[0].toLowerCase();
         }
         return null;
     };
 
     this.getReturnUnit = (initUnit) => {
+        const lowerInitUnit = initUnit?.toLowerCase();
         let result;
-        switch (initUnit) {
+        switch (lowerInitUnit) {
         case 'gal':
             result = 'L';
             break;
-        case 'L':
+        case 'l':
             result = 'gal';
             break;
         case 'mi':
@@ -49,12 +51,13 @@ function ConvertHandler() {
     };
 
     this.spellOutUnit = (unit) => {
+        const lowerUnit = unit?.toLowerCase();
         let result;
-        switch (unit) {
+        switch (lowerUnit) {
         case 'gal':
             result = 'gallons';
             break;
-        case 'L':
+        case 'l':
             result = 'liters';
             break;
         case 'mi':
@@ -81,11 +84,12 @@ function ConvertHandler() {
         const lbsToKg = 0.453592;
         const miToKm = 1.60934;
         let result;
-        switch (initUnit) {
+        const lowerInitUnit = initUnit?.toLowerCase();
+        switch (lowerInitUnit) {
         case 'gal':
             result = round(initNum * galToL);
             break;
-        case 'L':
+        case 'l':
             result = round(initNum * (1 / galToL));
             break;
         case 'mi':

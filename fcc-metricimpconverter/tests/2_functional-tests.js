@@ -16,9 +16,9 @@ suite('Functional Tests', () => {
                 assert.equal(res.type, 'application/json');
                 assert.equal(res.body.initNum, '4');
                 assert.equal(res.body.initUnit, 'gal');
-                assert.equal(res.body.returnNum, '15.142');
+                assert.equal(res.body.returnNum, '15.14164');
                 assert.equal(res.body.returnUnit, 'L');
-                assert.equal(res.body.string, '4 gallons converts to 15.142 liters');
+                assert.equal(res.body.string, '4 gallons converts to 15.14164 liters');
                 done();
             });
     });
@@ -61,9 +61,9 @@ suite('Functional Tests', () => {
                 assert.equal(res.type, 'application/json');
                 assert.equal(res.body.initNum, '1');
                 assert.equal(res.body.initUnit, 'kg');
-                assert.equal(res.body.returnNum, '2.205');
+                assert.equal(res.body.returnNum, '2.20462');
                 assert.equal(res.body.returnUnit, 'lbs');
-                assert.equal(res.body.string, '1 kilograms converts to 2.205 pounds');
+                assert.equal(res.body.string, '1 kilograms converts to 2.20462 pounds');
                 done();
             });
     });
